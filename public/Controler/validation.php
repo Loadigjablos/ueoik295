@@ -28,7 +28,7 @@
         return $_float;
     }
     /**
-     * @param _bool the integer that will be processed to safety
+     * @param _bool changes every value to a boolean
      * @return _bool either true or false
      */
     function validate_boolean($_bool) {
@@ -53,12 +53,14 @@
         http_response_code($status_code);
         die();
     }
+    use ReallySimpleJWT\Token; // to get the token
     /**
      * validates the token in the cookies if it is valid.
      */
     function validate_token() {
         require_once "Controler/Secret.php";
-        if (isset($_COOKIE["token"]) || Token::validate($_COOKIE["token"], $_passwd)) {
+
+        if (isset($_COOKIE["token"]) && Token::validate($_COOKIE["token"], $_passwd)) {
             return;
         } else {
             error_function(401, "unotherised");
