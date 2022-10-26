@@ -25,6 +25,10 @@
     $app = AppFactory::create();
 
     /**
+     * @OA\DB(title="Products")
+     */
+
+    /**
     * @OA\Post(
     *   path="Localhost/Login",
     *   summary="You can authenticate yourself",
@@ -289,9 +293,9 @@
         set_product_data($sku, $active, $id_category, $name, $image, $description, $price, $stock);
     });
 
-
-    // The API part for Category
-
+    /**
+     * @OA\DB(title="Category")
+     */
 
     /**
     * @OA\Get(
@@ -334,7 +338,7 @@
     $app->get("/Category/{category_id}", function (Request $request, Response $response, $args) {
         validate_token();
 
-        $category_id = validate_string($args["category_id"]);
+        $category_id = validate_number($args["category_id"]);
 
         echo json_encode(get_one_category($category_id));
 
@@ -391,7 +395,7 @@
         return $response; 
     });
 
-        /**
+    /**
     * @OA\Delete(
     *   path="Localhost/Product/{sku}",
     *   summary="deletes one product",
@@ -409,12 +413,63 @@
     *   @OA\Response(response="200", description="Erklärung der Antwort mit Status 200"))
     * )
     */
-    $app->delete("/Product/{sku}", function (Request $request, Response $response, $args) {
+    $app->delete("/Category/{category_id}", function (Request $request, Response $response, $args) {
         validate_token();
 
-        $sku = validate_string($args["sku"]);
+        $category_id = validate_number($args["category_id"]);
 
-        delete_one_product($sku);
+        delete_one_category($category_id);
+    });
+
+        /**
+    * @OA\Put(
+    *   path="/Pfad/Zum/Endpoint/{parameter}",
+    *   summary="Beschreibung hier einfügen (Was macht der Endpoint?)",
+    *   tags={"Tag hier einfügen (ist wie eine Kategorie)"},
+    *   @OA\Parameter(
+    *       name="parameter",
+    *       in="path",
+    *       required=true,
+    *       description="Beschreibung des Parameters",
+    *       @OA\Schema(
+    *           type="string",
+    *           example="Kochschinken"
+    *       )
+    *   ),
+    *   requestBody=@OA\RequestBody(
+    *   request="/Pfad/Zum/Endpoint",
+    *   required=true,
+    *   description="Beschreiben was im Request Body enthalten sein muss",
+    *   @OA\MediaType(
+    *       mediaType="application/json",
+    *           @OA\Schema(
+    *               @OA\Property(property="andere_eigenschaft", type="string", example="Beispiel"),
+    *               @OA\Property(property="eigenschaft", type="integer", example="13")
+    *           )
+    *       )
+    *   ),
+    *   @OA\Response(response="200", description="Erklärung der Antwort mit Status 200"))
+    * )
+    */
+    $app->put("/Category/{category_id}", function (Request $request, Response $response, $args) {
+        validate_token();
+
+        $category_id = validate_number($args["category_id"]);
+
+        // reads the requested JSON body
+        $body_content = file_get_contents("php://input");
+        $JSON_data = json_decode($body_content, true);
+
+        // if JSON data doesn't have these then there is an error
+        if (isset($JSON_data["active"]) && isset($JSON_data["name"])) { } else {
+            error_function(400, "Empty request");
+        }
+
+        // Prepares the data to prevent bad data, SQL injection and Cross site scripting
+        $active = validate_boolean($JSON_data["active"]);
+        $name = validate_string($JSON_data["name"]);
+
+        set_category_data($category_id, $active, $name);
     });
 
     $app->run();

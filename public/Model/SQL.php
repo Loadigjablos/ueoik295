@@ -147,26 +147,14 @@
      * @param $email the new email of a new user
      * @return procces information
      */
-    function set_product_category($sku, $active, $id_category, $name, $image, $description, $price, $stock) {
+    function set_category_data($category_id, $active, $name) {
         global $database;
 
-        // selects the user by user_id
-        $result = $database->query("SELECT * FROM product WHERE sku = \"$sku\"");
-
-        if ($result == false) {
-            error_function(500, "Wrong SQL Statment");
-		} else if ($result !== true) {
-			if ($result->num_rows > 0) { } else {
-                error_function(404, "user Not Found");
-            }
-		}
-
-        $properties = array("active" => $active, "id_category" => $id_category, "name" => $name, "image" => $image, "description" => $description, "price" => $price, "stock" => $stock);
+        $properties = array("active" => $active, "name" => $name);
 
         foreach ($properties as $key => $value) {
             if (!($value === null) || !(empty($value))) {
-                $result = $database->query("UPDATE product SET $key = '$value' WHERE sku = '$sku'");
-
+                $database->query("UPDATE category SET $key = '$value' WHERE category_id = $category_id");
             }
         }
         message_function(201, "Succesfuly updated a product");
@@ -190,18 +178,17 @@
     }
     /**
      * deletes the user with a SQL statement.
-     * @param $user_id the primary key to identify what user
-     * @return procces information
+     * @param $product_id the primary key to identify what ca
      */
-    function delete_one_category($sku) {
+    function delete_one_category($category_id) {
         global $database;
 
-        $result = $database->query("DELETE FROM product WHERE sku = '$sku'");
+        $result = $database->query("DELETE FROM category WHERE category_id = '$category_id'");
 
         if (!$result) {
-            error_function(404, "user does not exist");
+            error_function(404, "category does not exist");
         } else {
-            message_function(201, "Succesfuly Deleted a user");
+            message_function(201, "Succesfuly Deleted a category");
         }
     }
     /**
