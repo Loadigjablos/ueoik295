@@ -4,22 +4,23 @@
      * @OA\Info(title="REST-API", version="0.1")
      */
 
-    // Als erstes laden Sie die Request- und Response-Klassen von PSR. Diese benötigen wir logischerweise, um mit Anfragen und Antworten zu hantieren.
+    // this handel the request and response.
     use Psr\Http\Message\ResponseInterface as Response; 
     use Psr\Http\Message\ServerRequestInterface as Request;
 
-    // Now we also need the AppFactory from Slim. This allows us to Using Slim and building our application.
+    // This allows to Using Slim and build our application.
     use Slim\Factory\AppFactory;
 
-    // To create a JWT
+    // To create a JWT Token for authentication
     use ReallySimpleJWT\Token;
 
     // all the libraries we need.
     require __DIR__ . "/../vendor/autoload.php";
-
+    // self made functions
     require_once "Controler/validation.php";
     require_once "Model/SQL.php";
 
+    // all response data will be in the Json Fromat
     header("Content-Type: application/json");
 
     $app = AppFactory::create();
@@ -87,7 +88,7 @@
         return $response; 
     });
 
-    // The API part for Productsr
+    // The API part for Products
 
     /**
     * @OA\Get(
@@ -96,8 +97,6 @@
     *   tags={"Products"},
     *   @OA\Response(response="200", description="data"),
     *   @OA\Response(response="401", description="unotharised"),
-    *   @OA\Response(response="400", description="Invalid input"),
-    *   @OA\Response(response="404", description="Invalid Input"),
     *   @OA\Response(response="500", description="Server Error")
     * )
     */
@@ -113,18 +112,22 @@
     * @OA\Get(
     *   path="Localhost/Product/{sku}",
     *   summary="to list all products",
-    *   tags={"get"},
+    *   tags={"product"},
     *   @OA\Parameter(
     *       name="sku",
     *       in="Localhost/Product/{sku}",
     *       required=true,
-    *       description="Beschreibung des Parameters",
+    *       description="",
     *       @OA\Schema(
     *           type="string",
-    *           example="Kochschinken"
+    *           example="f8f6fzfuj"
     *       )
     *   ),
-    *   @OA\Response(response="200", description="Erklärung der Antwort mit Status 200")
+    *   @OA\Response(response="200", description="data"),
+    *   @OA\Response(response="401", description="unotharised"),
+    *   @OA\Response(response="400", description="Invalid input"),
+    *   @OA\Response(response="404", description="Invalid Input"),
+    *   @OA\Response(response="500", description="Server Error")
     * )
     */
     $app->get("/Product/{sku}", function (Request $request, Response $response, $args) {
@@ -139,22 +142,32 @@
 
     /**
     * @OA\Post(
-    *   path="/Pfad/Zum/Endpoint",
-    *   summary="Beschreibung hier einfügen (Was macht der Endpoint?)",
-    *   tags={"Tag hier einfügen (ist wie eine Kategorie)"},
+    *   path="Localhost/Product",
+    *   summary="you make a new product",
+    *   tags={"Product"},
     *   requestBody=@OA\RequestBody(
-    *       request="/Pfad/Zum/Endpoint",
+    *       request="Localhost/Product",
     *       required=true,
-    *       description="Beschreiben was im Request Body enthalten sein muss",
+    *       description="sku, active, id_category, name, image, description, price und stock",
     *       @OA\MediaType(
     *           mediaType="application/json",
     *           @OA\Schema(
-    *               @OA\Property(property="andere_eigenschaft", type="string", example="Beispiel"),
-    *               @OA\Property(property="eigenschaft", type="integer", example="13")
+    *               @OA\Property(property="sku", type="string", example="kh3khfvk"),
+    *               @OA\Property(property="active", type="boolean", example="true"),
+    *               @OA\Property(property="id_category", type="integer", example="1"),
+    *               @OA\Property(property="name", type="string", example="Jev"),
+    *               @OA\Property(property="image", type="string", example="3wferge"),
+    *               @OA\Property(property="description", type="string", example="das ist ein ding"),
+    *               @OA\Property(property="price", type="float", example="12.45"),
+    *               @OA\Property(property="stock", type="integer", example="234")
     *           )
     *       )
     *   ),
-    *   @OA\Response(response="200", description="Erklärung der Antwort mit Status 200")
+    *   @OA\Response(response="201", description="added data"),
+    *   @OA\Response(response="401", description="unotharised"),
+    *   @OA\Response(response="400", description="Invalid input"),
+    *   @OA\Response(response="404", description="Invalid Input"),
+    *   @OA\Response(response="500", description="Server Error")
     * )
     */
     $app->post("/Product", function (Request $request, Response $response, $args) {
@@ -215,18 +228,22 @@
     * @OA\Delete(
     *   path="Localhost/Product/{sku}",
     *   summary="deletes one product",
-    *   tags={"Tag hier einfügen (ist wie eine Kategorie)"},
+    *   tags={"Product"},
     *   @OA\Parameter(
-    *       name="parameter",
-    *       in="path",
+    *       name="sku",
+    *       in="Localhost/Product/{sku}",
     *       required=true,
-    *       description="Beschreibung des Parameters",
+    *       description="to identify a uneque product",
     *       @OA\Schema(
     *       type="string",
-    *       example="Kochschinken"
+    *       example="er6ztdh"
     *      )
     *   ),
-    *   @OA\Response(response="200", description="Erklärung der Antwort mit Status 200"))
+    *   @OA\Response(response="201", description="added data"),
+    *   @OA\Response(response="401", description="unotharised"),
+    *   @OA\Response(response="400", description="Invalid input"),
+    *   @OA\Response(response="404", description="Invalid Input"),
+    *   @OA\Response(response="500", description="Server Error")
     * )
     */
     $app->delete("/Product/{sku}", function (Request $request, Response $response, $args) {
@@ -235,36 +252,48 @@
         $sku = validate_string($args["sku"]);
 
         delete_one_product($sku);
+        return $response; 
     });
 
     /**
     * @OA\Put(
-    *   path="/Pfad/Zum/Endpoint/{parameter}",
-    *   summary="Beschreibung hier einfügen (Was macht der Endpoint?)",
-    *   tags={"Tag hier einfügen (ist wie eine Kategorie)"},
+    *   path="Localhost/Product/{sku}",
+    *   summary="products values get changed",
+    *   tags={"product"},
     *   @OA\Parameter(
-    *       name="parameter",
-    *       in="path",
+    *       name="sku",
+    *       in="Localhost/Product/{sku}",
     *       required=true,
-    *       description="Beschreibung des Parameters",
+    *       description="identifies",
     *       @OA\Schema(
     *           type="string",
-    *           example="Kochschinken"
+    *           example="923gw3k3"
     *       )
     *   ),
     *   requestBody=@OA\RequestBody(
-    *   request="/Pfad/Zum/Endpoint",
-    *   required=true,
-    *   description="Beschreiben was im Request Body enthalten sein muss",
-    *   @OA\MediaType(
-    *       mediaType="application/json",
-    *           @OA\Schema(
-    *               @OA\Property(property="andere_eigenschaft", type="string", example="Beispiel"),
-    *               @OA\Property(property="eigenschaft", type="integer", example="13")
+    *       request="/Pfad/Zum/Endpoint",
+    *       required=true,
+    *       description="change product data",
+    *       @OA\MediaType(
+    *           mediaType="application/json",
+    *               @OA\Schema(
+    *                   @OA\Property(property="sku", type="string", example="kh3khfvk"),
+    *                   @OA\Property(property="active", type="boolean", example="true"),
+    *                   @OA\Property(property="id_category", type="integer", example="1"),
+    *                   @OA\Property(property="name", type="string", example="Jev"),
+    *                   @OA\Property(property="image", type="string", example="3wferge"),
+    *                   @OA\Property(property="description", type="string", example="das ist ein ding"),
+    *                   @OA\Property(property="price", type="float", example="12.45"),
+    *                   @OA\Property(property="stock", type="integer", example="234")
+    *               )
     *           )
     *       )
     *   ),
-    *   @OA\Response(response="200", description="Erklärung der Antwort mit Status 200"))
+    *   @OA\Response(response="201", description="added data"),
+    *   @OA\Response(response="401", description="unotharised"),
+    *   @OA\Response(response="400", description="Invalid input"),
+    *   @OA\Response(response="404", description="Invalid Input"),
+    *   @OA\Response(response="500", description="Server Error")
     * )
     */
     $app->put("/Product/{sku}", function (Request $request, Response $response, $args) {
@@ -291,6 +320,7 @@
         $stock = validate_number($JSON_data["stock"]);
 
         set_product_data($sku, $active, $id_category, $name, $image, $description, $price, $stock);
+        return $response; 
     });
 
     /**
@@ -299,9 +329,9 @@
 
     /**
     * @OA\Get(
-    *   path="Localhost/Products",
-    *   summary="to list all products",
-    *   tags={"Products"},
+    *   path="Localhost/Categorys",
+    *   summary="get data from category",
+    *   tags={"category"},
     *   @OA\Response(response="200", description="data"),
     *   @OA\Response(response="401", description="unotharised"),
     *   @OA\Response(response="400", description="Invalid input"),
@@ -319,20 +349,24 @@
 
     /**
     * @OA\Get(
-    *   path="Localhost/Product/{sku}",
-    *   summary="to list all products",
-    *   tags={"get"},
+    *   path="Localhost/Category/{category_id}",
+    *   summary="to list all category",
+    *   tags={"category"},
     *   @OA\Parameter(
-    *       name="sku",
-    *       in="Localhost/Product/{sku}",
+    *       name="category_id",
+    *       in="Localhost/Category/{category_id}",
     *       required=true,
-    *       description="Beschreibung des Parameters",
+    *       description="idetify what category",
     *       @OA\Schema(
-    *           type="string",
+    *           type="integer",
     *           example="Kochschinken"
     *       )
     *   ),
-    *   @OA\Response(response="200", description="Erklärung der Antwort mit Status 200")
+    *   @OA\Response(response="200", description="data"),
+    *   @OA\Response(response="401", description="unotharised"),
+    *   @OA\Response(response="400", description="Invalid input"),
+    *   @OA\Response(response="404", description="Invalid Input"),
+    *   @OA\Response(response="500", description="Server Error")
     * )
     */
     $app->get("/Category/{category_id}", function (Request $request, Response $response, $args) {
@@ -347,22 +381,26 @@
 
     /**
     * @OA\Post(
-    *   path="/Pfad/Zum/Endpoint",
-    *   summary="Beschreibung hier einfügen (Was macht der Endpoint?)",
-    *   tags={"Tag hier einfügen (ist wie eine Kategorie)"},
+    *   path="Localhost/Category",
+    *   summary="new category",
+    *   tags={"category"},
     *   requestBody=@OA\RequestBody(
-    *       request="/Pfad/Zum/Endpoint",
+    *       request="Localhost/Category",
     *       required=true,
-    *       description="Beschreiben was im Request Body enthalten sein muss",
+    *       description="values for category",
     *       @OA\MediaType(
     *           mediaType="application/json",
     *           @OA\Schema(
-    *               @OA\Property(property="andere_eigenschaft", type="string", example="Beispiel"),
-    *               @OA\Property(property="eigenschaft", type="integer", example="13")
+    *               @OA\Property(property="name", type="string", example="Beispiel :-)"),
+    *               @OA\Property(property="active", type="boolean", example="true")
     *           )
     *       )
     *   ),
-    *   @OA\Response(response="200", description="Erklärung der Antwort mit Status 200")
+    *   @OA\Response(response="201", description="added data"),
+    *   @OA\Response(response="401", description="unotharised"),
+    *   @OA\Response(response="400", description="Invalid input"),
+    *   @OA\Response(response="404", description="Invalid Input"),
+    *   @OA\Response(response="500", description="Server Error")
     * )
     */
     $app->post("/Category", function (Request $request, Response $response, $args) {
@@ -397,20 +435,24 @@
 
     /**
     * @OA\Delete(
-    *   path="Localhost/Product/{sku}",
-    *   summary="deletes one product",
-    *   tags={"Tag hier einfügen (ist wie eine Kategorie)"},
+    *   path="Localhost/Category/{category_id}",
+    *   summary="deletes one category",
+    *   tags={"category"},
     *   @OA\Parameter(
-    *       name="parameter",
-    *       in="path",
+    *       name="sku",
+    *       in="Localhost/Category/{category_id}",
     *       required=true,
     *       description="Beschreibung des Parameters",
     *       @OA\Schema(
     *       type="string",
-    *       example="Kochschinken"
+    *       example="5tdgc7"
     *      )
     *   ),
-    *   @OA\Response(response="200", description="Erklärung der Antwort mit Status 200"))
+    *   @OA\Response(response="201", description="added data"),
+    *   @OA\Response(response="401", description="unotharised"),
+    *   @OA\Response(response="400", description="Invalid input"),
+    *   @OA\Response(response="404", description="Invalid Input"),
+    *   @OA\Response(response="500", description="Server Error")
     * )
     */
     $app->delete("/Category/{category_id}", function (Request $request, Response $response, $args) {
@@ -419,36 +461,41 @@
         $category_id = validate_number($args["category_id"]);
 
         delete_one_category($category_id);
+        return $response; 
     });
 
-        /**
+    /**
     * @OA\Put(
-    *   path="/Pfad/Zum/Endpoint/{parameter}",
-    *   summary="Beschreibung hier einfügen (Was macht der Endpoint?)",
-    *   tags={"Tag hier einfügen (ist wie eine Kategorie)"},
+    *   path="Localhost/Category/{category_id}",
+    *   summary="change category data",
+    *   tags={"category"},
     *   @OA\Parameter(
-    *       name="parameter",
-    *       in="path",
+    *       name="category_id",
+    *       in="Localhost/Category/{category_id}",
     *       required=true,
     *       description="Beschreibung des Parameters",
     *       @OA\Schema(
     *           type="string",
-    *           example="Kochschinken"
+    *           example="65du6rtzjk"
     *       )
     *   ),
     *   requestBody=@OA\RequestBody(
-    *   request="/Pfad/Zum/Endpoint",
-    *   required=true,
-    *   description="Beschreiben was im Request Body enthalten sein muss",
-    *   @OA\MediaType(
-    *       mediaType="application/json",
+    *       request="Localhost/Category/{category_id}",
+    *       required=true,
+    *       description="to change category data",
+    *       @OA\MediaType(
+    *           mediaType="application/json",
     *           @OA\Schema(
-    *               @OA\Property(property="andere_eigenschaft", type="string", example="Beispiel"),
-    *               @OA\Property(property="eigenschaft", type="integer", example="13")
+    *               @OA\Property(property="name", type="string", example="Beispiel :-)"),
+    *               @OA\Property(property="active", type="boolean", example="true")
     *           )
     *       )
     *   ),
-    *   @OA\Response(response="200", description="Erklärung der Antwort mit Status 200"))
+    *   @OA\Response(response="201", description="added data"),
+    *   @OA\Response(response="401", description="unotharised"),
+    *   @OA\Response(response="400", description="Invalid input"),
+    *   @OA\Response(response="404", description="Invalid Input"),
+    *   @OA\Response(response="500", description="Server Error")
     * )
     */
     $app->put("/Category/{category_id}", function (Request $request, Response $response, $args) {
@@ -470,6 +517,7 @@
         $name = validate_string($JSON_data["name"]);
 
         set_category_data($category_id, $active, $name);
+        return $response; 
     });
 
     $app->run();

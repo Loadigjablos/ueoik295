@@ -6,22 +6,23 @@
     function validate_string($_string) {
         $_string = addslashes($_string);
         $_string = strip_tags($_string);
+        // a string needs at least one character
         if (!(isset($_string) && !(strlen($_string) < 1) && !(empty($_string)))) {
             return false;
         }
         return $_string;
     }
     /**
-     * @param _integer the integer that will be processed to safety
-     * @return _integer either false or a correct integer
+     * @param _integer this variable will be turned into a safe integer
+     * @return _integer a integer number
      */
     function validate_number($_integer) {
         $_integer = intval($_integer);
         return $_integer;
     }
     /**
-     * @param _float the float that will be processed to safety
-     * @return _float either false or a correct float
+     * @param _float this variable will be turned into a safe float
+     * @return _float a float number
      */
     function validate_float($_float) {
         $_float = floatval($_float);
@@ -55,7 +56,7 @@
     }
     use ReallySimpleJWT\Token; // to get the token
     /**
-     * validates the token in the cookies if it is valid.
+     * validates the token in the cookies if it matches with the secret.
      */
     function validate_token() {
         require_once "Controler/Secret.php";
