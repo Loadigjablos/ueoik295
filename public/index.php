@@ -25,13 +25,11 @@
 
     $app = AppFactory::create();
 
-    /**
-     * @OA\DB(title="Products")
-     */
+    // products
 
     /**
     * @OA\Post(
-    *   path="Localhost/Login",
+    *   path="/Login",
     *   summary="You can authenticate yourself",
     *   tags={"Login"},
     *   requestBody=@OA\RequestBody(
@@ -92,16 +90,16 @@
 
     /**
     * @OA\Get(
-    *   path="Localhost/Products",
+    *   path="/Products",
     *   summary="to list all products",
-    *   tags={"Products"},
+    *   tags={"Product"},
     *   @OA\Response(response="200", description="data"),
     *   @OA\Response(response="401", description="unotharised"),
     *   @OA\Response(response="500", description="Server Error")
     * )
     */
     $app->get("/Products", function (Request $request, Response $response, $args) {
-        validate_token();
+        validate_token(); // unotherized pepole will get rejected
 
         echo json_encode(get_all_products());
 
@@ -110,12 +108,12 @@
 
     /**
     * @OA\Get(
-    *   path="Localhost/Product/{sku}",
+    *   path="/Product/{sku}",
     *   summary="to list all products",
-    *   tags={"product"},
+    *   tags={"Product"},
     *   @OA\Parameter(
     *       name="sku",
-    *       in="Localhost/Product/{sku}",
+    *       in="path",
     *       required=true,
     *       description="",
     *       @OA\Schema(
@@ -142,11 +140,11 @@
 
     /**
     * @OA\Post(
-    *   path="Localhost/Product",
+    *   path="/Product",
     *   summary="you make a new product",
     *   tags={"Product"},
     *   requestBody=@OA\RequestBody(
-    *       request="Localhost/Product",
+    *       request="Product",
     *       required=true,
     *       description="sku, active, id_category, name, image, description, price und stock",
     *       @OA\MediaType(
@@ -179,7 +177,7 @@
        $body_content = file_get_contents("php://input");
        $JSON_data = json_decode($body_content, true);
 
-       // if JSON data doesn't have these then there is an error
+       // if the requested JSON data doesn't have these then there is an error
        if (isset($JSON_data["sku"]) && isset($JSON_data["active"]) && isset($JSON_data["id_category"]) && isset($JSON_data["name"]) && isset($JSON_data["image"]) && isset($JSON_data["description"]) && isset($JSON_data["price"]) && isset($JSON_data["stock"])) { } else {
            error_function(400, "Empty request");
        }
@@ -226,12 +224,12 @@
 
     /**
     * @OA\Delete(
-    *   path="Localhost/Product/{sku}",
+    *   path="/Product/{sku}",
     *   summary="deletes one product",
     *   tags={"Product"},
     *   @OA\Parameter(
     *       name="sku",
-    *       in="Localhost/Product/{sku}",
+    *       in="path",
     *       required=true,
     *       description="to identify a uneque product",
     *       @OA\Schema(
@@ -257,12 +255,12 @@
 
     /**
     * @OA\Put(
-    *   path="Localhost/Product/{sku}",
+    *   path="/Product/{sku}",
     *   summary="products values get changed",
-    *   tags={"product"},
+    *   tags={"Product"},
     *   @OA\Parameter(
     *       name="sku",
-    *       in="Localhost/Product/{sku}",
+    *       in="path",
     *       required=true,
     *       description="identifies",
     *       @OA\Schema(
@@ -271,21 +269,20 @@
     *       )
     *   ),
     *   requestBody=@OA\RequestBody(
-    *       request="/Pfad/Zum/Endpoint",
+    *       request="/Product/{sku}",
     *       required=true,
-    *       description="change product data",
+    *       description="changes product data",
     *       @OA\MediaType(
     *           mediaType="application/json",
-    *               @OA\Schema(
-    *                   @OA\Property(property="sku", type="string", example="kh3khfvk"),
-    *                   @OA\Property(property="active", type="boolean", example="true"),
-    *                   @OA\Property(property="id_category", type="integer", example="1"),
-    *                   @OA\Property(property="name", type="string", example="Jev"),
-    *                   @OA\Property(property="image", type="string", example="3wferge"),
-    *                   @OA\Property(property="description", type="string", example="das ist ein ding"),
-    *                   @OA\Property(property="price", type="float", example="12.45"),
-    *                   @OA\Property(property="stock", type="integer", example="234")
-    *               )
+    *           @OA\Schema(
+    *               @OA\Property(property="sku", type="string", example="kh3khfvk"),
+    *               @OA\Property(property="active", type="boolean", example="true"),
+    *               @OA\Property(property="id_category", type="integer", example="1"),
+    *               @OA\Property(property="name", type="string", example="Jev"),
+    *               @OA\Property(property="image", type="string", example="3wferge"),
+    *               @OA\Property(property="description", type="string", example="das ist ein ding"),
+    *               @OA\Property(property="price", type="float", example="12.45"),
+    *               @OA\Property(property="stock", type="integer", example="234")
     *           )
     *       )
     *   ),
@@ -323,13 +320,11 @@
         return $response; 
     });
 
-    /**
-     * @OA\DB(title="Category")
-     */
+    // category
 
     /**
     * @OA\Get(
-    *   path="Localhost/Categorys",
+    *   path="/Categorys",
     *   summary="get data from category",
     *   tags={"category"},
     *   @OA\Response(response="200", description="data"),
@@ -349,12 +344,12 @@
 
     /**
     * @OA\Get(
-    *   path="Localhost/Category/{category_id}",
+    *   path="/Category/{category_id}",
     *   summary="to list all category",
     *   tags={"category"},
     *   @OA\Parameter(
     *       name="category_id",
-    *       in="Localhost/Category/{category_id}",
+    *       in="path",
     *       required=true,
     *       description="idetify what category",
     *       @OA\Schema(
@@ -381,11 +376,11 @@
 
     /**
     * @OA\Post(
-    *   path="Localhost/Category",
+    *   path="/Category",
     *   summary="new category",
     *   tags={"category"},
     *   requestBody=@OA\RequestBody(
-    *       request="Localhost/Category",
+    *       request="Category",
     *       required=true,
     *       description="values for category",
     *       @OA\MediaType(
@@ -435,12 +430,12 @@
 
     /**
     * @OA\Delete(
-    *   path="Localhost/Category/{category_id}",
+    *   path="/Category/{category_id}",
     *   summary="deletes one category",
     *   tags={"category"},
     *   @OA\Parameter(
     *       name="sku",
-    *       in="Localhost/Category/{category_id}",
+    *       in="path",
     *       required=true,
     *       description="Beschreibung des Parameters",
     *       @OA\Schema(
@@ -466,12 +461,12 @@
 
     /**
     * @OA\Put(
-    *   path="Localhost/Category/{category_id}",
+    *   path="/Category/{category_id}",
     *   summary="change category data",
     *   tags={"category"},
     *   @OA\Parameter(
     *       name="category_id",
-    *       in="Localhost/Category/{category_id}",
+    *       in="path",
     *       required=true,
     *       description="Beschreibung des Parameters",
     *       @OA\Schema(
@@ -480,7 +475,7 @@
     *       )
     *   ),
     *   requestBody=@OA\RequestBody(
-    *       request="Localhost/Category/{category_id}",
+    *       request="/Category/{category_id}",
     *       required=true,
     *       description="to change category data",
     *       @OA\MediaType(
@@ -507,7 +502,7 @@
         $body_content = file_get_contents("php://input");
         $JSON_data = json_decode($body_content, true);
 
-        // if JSON data doesn't have these then there is an error
+        // if the requested JSON data doesn't have these then there is an error
         if (isset($JSON_data["active"]) && isset($JSON_data["name"])) { } else {
             error_function(400, "Empty request");
         }

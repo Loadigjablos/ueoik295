@@ -18,7 +18,7 @@
     function set_product_data($sku, $active, $id_category, $name, $image, $description, $price, $stock) {
         global $database;
 
-        // cheeks if the category is there
+        // examines if the category is there
         $result = $database->query("SELECT * FROM category WHERE category_id = \"$id_category\"");
 
         if ($result == false) {
@@ -29,7 +29,7 @@
             }
 		}
 
-        // cheks if the product exists
+        // examines if the product exists
         $result = $database->query("SELECT * FROM product WHERE sku = \"$sku\"");
 
         if ($result == false) {
@@ -106,6 +106,7 @@
         if ($result == false) {
             error_function(500, "Wrong SQL Statment");
 		} else if ($result !== true) {
+            // gets data from the list
 			if (!($result->num_rows > 0)) {
                 error_function(404, "product Not Found");
             }
@@ -227,7 +228,7 @@
     function delete_one_category($category_id) {
         global $database;
 
-        // cheks if the product exists
+        // examines if the product exists
         $result = $database->query("SELECT * FROM category WHERE category_id = \"$category_id\"");
 
         if ($result == false) {
@@ -255,7 +256,7 @@
     function get_all_categorys() {
         global $database;
 
-        //Get all user.
+        // Get all user.
 		$result = $database->query("SELECT * FROM category");
 
         if ($result == false) {
@@ -282,7 +283,7 @@
     function get_one_category($category_id) {
         global $database;
 
-        // selects the user by user_id
+        // selects the category by category_id
         $result = $database->query("SELECT * FROM category WHERE category_id = \"$category_id\"");
 
         if ($result == false) {
